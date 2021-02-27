@@ -1,4 +1,4 @@
-classdef PsuedoRangeGroup
+classdef PsuedoRangeGroup < handle
     %PSUEDORANGEGROUP Methods pertaining to PsuedoRangeGroups
     
     properties(Access = protected)
@@ -7,10 +7,13 @@ classdef PsuedoRangeGroup
         ysats
         zsats
         bsats
-        n_measurements
-        data_matrix
+        
         tolerance = 1e-3;
         max_iter = 50;
+    end
+    
+    properties(GetAccess = public, SetAccess = protected)
+        n_measurements
     end
     
     methods(Access = public)
@@ -59,6 +62,14 @@ classdef PsuedoRangeGroup
                 i = i+1;
             end
         end
+        function [mrhos,xsats,ysats,zsats,bsats] = get_data(obj)
+            % get data associated with this object
+            mrhos = obj.mrhos;
+            xsats = obj.xsats;
+            ysats = obj.ysats;
+            zsats = obj.zsats;
+            bsats = obj.bsats;
+        end
     end
     
     methods(Access = protected)
@@ -79,8 +90,7 @@ classdef PsuedoRangeGroup
             rho0s = sqrt(sum(G(:,1:3).^2, 2));
             
             G(:,1:3) = G(:,1:3) ./ rho0s;
-        end
-        
+        end    
         function rhos = predict_psuedoranges(obj, x0)
             % Computes the predicted psuedoranges given an initial guess x0
             % and the available satellite state data.
@@ -91,6 +101,6 @@ classdef PsuedoRangeGroup
             b = x0(4);
             
             rhos = sqrt(sum(dx.^2 + dy.^2 + dz.^2, 2)) + b - obj.bsats;
-        end  
+        end
     end
 end
