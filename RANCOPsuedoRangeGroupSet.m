@@ -1,5 +1,5 @@
 classdef RANCOPsuedoRangeGroupSet < PsuedoRangeGroupSet
-    %RANCOPSUEDORANGEGROUPSET Class pertaining to RANCO sets of 
+    %RANCOPSUEDORANGEGROUPSET Class pertaining to RANCO sets of
     %PseudoRangeGroups
     
     properties
@@ -28,6 +28,24 @@ classdef RANCOPsuedoRangeGroupSet < PsuedoRangeGroupSet
             
             obj@PsuedoRangeGroupSet(psuedoRangeGroups);
             obj.psuedoRangeGroupSetParent = psuedoRangeGroup;
+        end
+        function sat_errors = satellite_errors(obj)
+
+            N = length(obj.psuedoRangeGroupSet);
+
+            [xrs, ns, Gs] = obj.solve_each_newton_raphson();
+
+            sat_errors = zeros(N, obj.psuedoRangeGroupSetParent.n_measurements);
+
+            for i = 1:N
+                xr = xrs(:,i);
+                n = ns(:,i);
+                G = squeeze(Gs(i,:,:));
+
+                LOSs = obj.psuedoRangeGroupSetParent.geometry_matrix(xr);
+
+                sat_errors(i,:) = LOSs / G * n;
+            end
         end
     end
 end

@@ -8,7 +8,7 @@ classdef PsuedoRangeGroup < handle
         zsats
         bsats
         
-        tolerance = 1e-3;
+        tolerance = 1e-6;
         max_iter = 50;
     end
     
@@ -34,7 +34,7 @@ classdef PsuedoRangeGroup < handle
             obj.zsats = zsats;
             obj.bsats = bsats;
         end
-        function xr = solve_newton_raphson(obj)
+        function [xr, n, G] = solve_newton_raphson(obj)
             % Computes the position solution with the Newton Raphson
             % method.
             
@@ -49,18 +49,19 @@ classdef PsuedoRangeGroup < handle
                 
                 del_xb = G \ drho;
                 
-                xr = xr + del_xb;
-                
                 if norm(del_xb) < obj.tolerance
                     break;
                 end
                 
+                xr = xr + del_xb;
+
                 if i == obj.max_iter
                     error("Reached Max Iteration");
                 end
                 
                 i = i+1;
             end
+            n = obj.mrhos - obj.predict_psuedoranges(xr);
         end
         function [mrhos,xsats,ysats,zsats,bsats] = get_data(obj)
             % get data associated with this object
@@ -72,7 +73,7 @@ classdef PsuedoRangeGroup < handle
         end
     end
     
-    methods(Access = protected)
+    methods(Access = public)
         function G = geometry_matrix(obj, x0)
             % Constructs the geometry matrix give an initial guess x0 and
             % the available satellite state data.
