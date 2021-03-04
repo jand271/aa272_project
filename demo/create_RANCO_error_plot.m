@@ -19,10 +19,24 @@ rprgs = RANCOPsuedoRangeGroupSet(prg, 4);
 % compute the errors of all satellites on each subset of 4
 sat_errors = rprgs.satellite_errors();
 
-%% Plot
+% compute the thresholds of the same
+thresh = rprgs.threshold();
 
-figure;
+% array with only errors that are outliers
+outliers_indices = abs(sat_errors)>thresh;
+outlier_errors = sat_errors;
+outlier_errors(~outliers_indices) = nan;
+
+%% Compute which satellites are most frequently outliers
+satellite_outlier_frequency = sum(outliers_indices);
+
+%% Plot RANCO Errors
+% plot the RANCO errors indicating which are outliers
+
+figure
+hold on;
 plot(sat_errors, 'bo');
+plot(outlier_errors,'r*')
 xlabel('Subset Combitation Number');
 ylabel('Error Equation 6 from RANCO Paper');
 title('RANCO Errors For Each Satellite Against Each Subset');
