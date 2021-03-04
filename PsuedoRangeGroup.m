@@ -92,6 +92,39 @@ classdef PsuedoRangeGroup < handle
             
             G(:,1:3) = G(:,1:3) ./ rho0s;
         end    
+        
+        function [S,PDOP,TDOP,GDOP] = DOPcalcs(obj, x0)
+            % calculates dilution of precision values and sigma matrix given geometry matrix
+            % S = sigma matrix
+            % PDOP = position dilution of precision
+            % TDOP = time dilution of precision
+            % GDOP = geometric dilution of precision
+            
+            % geometry matrix
+            G = obj.geometry_matrix(x0);
+            
+            % forming the matrix
+            DOPmatrix = inv(G'*G);
+            
+            % elements along the diagonal
+            XDOP2 = DOPmatrix(1,1);
+            YDOP2 = DOPmatrix(2,2);
+            ZDOP2 = DOPmatrix(3,3);
+            TDOP2 = DOPmatrix(4,4);
+            
+            % DOP values
+            PDOP = sqrt(XDOP2+YDOP2+ZDOP2);
+            TDOP = sqrt(TDOP2);
+            GDOP = sqrt((PDOP^2)+(TDOP^2));
+            
+            % user range error sigma
+            sigma_URE = 6.7/3;
+            
+            % sigma matrix with sigmas along diagonal
+            S = (sigma_URE^2).*DOPmatrix;
+            
+        end
+        
         function rhos = predict_psuedoranges(obj, x0)
             % Computes the predicted psuedoranges given an initial guess x0
             % and the available satellite state data.
