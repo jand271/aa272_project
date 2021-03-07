@@ -92,6 +92,19 @@ classdef TestPseudoRangeGroup < matlab.unittest.TestCase
             testCase.verifyLessThan(norm(xr_BEI-xr_ALL), 1);
             testCase.verifyLessThan(norm(xr_GAL-xr_ALL), 1);
         end  
+        function test_against_hw4(testCase)
+            load(fullfile(fileparts(mfilename('fullpath')),'hw4_first_gnss_solution_data.mat'));
+            x = -2703950.14549877;
+            y = -4263087.17552819;
+            z = 3885060.28066444;
+            b = -1300.23569491921;
+            xr_correct = [x;y;z;b];
+            
+            prg = PsuedoRangeGroupGNSSLog(gnsslogdata);
+            xr_computed = prg.solve_newton_raphson();
+            
+            testCase.verifyEqual(xr_computed,xr_correct,'abstol',1e-7);
+        end
     end
 end
 
