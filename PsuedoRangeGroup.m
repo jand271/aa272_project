@@ -38,6 +38,13 @@ classdef PsuedoRangeGroup < handle
             % Computes the position solution with the Newton Raphson
             % method.
             
+            if length(obj.mrhos) < 4
+                xr = nan(4,1);
+                n = nan(4,1);
+                G = nan;
+                return;
+            end
+            
             xr = zeros(4,1);
             
             i = 0;
