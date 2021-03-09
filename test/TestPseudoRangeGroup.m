@@ -18,14 +18,12 @@ classdef TestPseudoRangeGroup < matlab.unittest.TestCase
         
         function test_against_hw3(testCase)
             
-            return; % REMOVE THIS STATEMENT WHEN append_satellite_positions IS READY
-            
-            % get correct satellite ECEF positions provided in hw2
-            load(fullfile(fileparts(mfilename('fullpath')),'hw2_first_gnss_solution_data.mat'));
-            xsats_correct = gnsslogdata.X;
-            ysats_correct = gnsslogdata.Y;
-            zsats_correct = gnsslogdata.Z;
-            bsats_correct = gnsslogdata.B;
+            % get correct satellite ECEF positions provided in hw3
+            load(fullfile(fileparts(mfilename('fullpath')),'hw3_solution_data.mat'));
+            xsats_correct = gnsslogdata.x_ECEFs_c;
+            ysats_correct = gnsslogdata.y_ECEFs_c;
+            zsats_correct = gnsslogdata.z_ECEFs_c;
+            bsats_correct = gnsslogdata.b_ECEFs_c;
             
             % remove the satellite ECEF positions
             gnsslogdata_woXYZB = gnsslogdata(:,1:end-4);
@@ -34,7 +32,7 @@ classdef TestPseudoRangeGroup < matlab.unittest.TestCase
             load(fullfile(fileparts(mfilename('fullpath')),'hw3_ephemeris_data.mat')); 
             
             % regenerate satellite ECEF positions
-            gnsslogdata_wXYZB = append_satellite_positions(eph, gnsslogdata_woXYZB);
+            gnsslogdata_wXYZB = SatelliteECEFs.append_satellite_positions(eph, gnsslogdata_woXYZB);
             
             % get computed satellite ECEF positions
             xsats_computed = gnsslogdata_wXYZB.X;
@@ -44,10 +42,10 @@ classdef TestPseudoRangeGroup < matlab.unittest.TestCase
             
             % assert that computed and correct values are close to each
             % other
-            testCase.verifyEqual(xsats_computed,xsats_correct,'abstol',1e-7);
-            testCase.verifyEqual(ysats_computed,ysats_correct,'abstol',1e-7);
-            testCase.verifyEqual(zsats_computed,zsats_correct,'abstol',1e-7);
-            testCase.verifyEqual(bsats_computed,bsats_correct,'abstol',1e-7);
+            testCase.verifyEqual(xsats_computed,xsats_correct,'abstol',5);
+            testCase.verifyEqual(ysats_computed,ysats_correct,'abstol',5);
+            testCase.verifyEqual(zsats_computed,zsats_correct,'abstol',5);
+            testCase.verifyEqual(bsats_computed,bsats_correct,'abstol',5);
         end
         
         function test_multi_constelation_10_min_data(testCase)
