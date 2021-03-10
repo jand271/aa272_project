@@ -56,7 +56,7 @@ classdef TestPseudoRangeGroup < matlab.unittest.TestCase
             load(fullfile(fileparts(mfilename('fullpath')),'MM_10_min_data.mat'));
             
             % build tables that seperate the data into constellations
-            gnsslogdata_ALL = gnsslogdata;
+            gnsslogdata_ALL = gnsslogdata(gnsslogdata.ConstellationType ~= 4,:);
             gnsslogdata_GPS = gnsslogdata(gnsslogdata.ConstellationType == 1,:);
             gnsslogdata_GLO = gnsslogdata(gnsslogdata.ConstellationType == 3,:);
             gnsslogdata_BEI = gnsslogdata(gnsslogdata.ConstellationType == 5,:);
