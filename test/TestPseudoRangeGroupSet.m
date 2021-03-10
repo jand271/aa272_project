@@ -5,7 +5,7 @@ classdef TestPseudoRangeGroupSet < matlab.unittest.TestCase
         function test_repeating_group(testCase)
             load(fullfile(fileparts(mfilename('fullpath')),'hw2_first_gnss_solution_data.mat'));
             
-            prg = PsuedoRangeGroupGNSSLog(gnsslogdata);
+            prg = PsuedoRangeGroupGNSSLog(gnsslogdata, false);
             xr_correct = prg.solve_newton_raphson();
             
             prgs = PsuedoRangeGroupSet([prg,prg,prg,prg,prg,prg]);
@@ -20,7 +20,7 @@ classdef TestPseudoRangeGroupSet < matlab.unittest.TestCase
             rng(0);
             load(fullfile(fileparts(mfilename('fullpath')),'hw2_first_gnss_solution_data.mat'));
             
-            prg = PsuedoRangeGroupGNSSLog(gnsslogdata);
+            prg = PsuedoRangeGroupGNSSLog(gnsslogdata, false);
             xr_correct = prg.solve_newton_raphson();
             
             prgs = BootstrapPsuedoRangeGroupSet(prg, 100, 5);

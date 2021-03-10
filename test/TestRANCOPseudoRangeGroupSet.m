@@ -5,7 +5,7 @@ classdef TestRANCOPseudoRangeGroupSet < matlab.unittest.TestCase
         function test_ranco_group_size(testCase)
             load(fullfile(fileparts(mfilename('fullpath')),'hw2_first_gnss_solution_data.mat'));
             
-            prg = PsuedoRangeGroupGNSSLog(gnsslogdata);
+            prg = PsuedoRangeGroupGNSSLog(gnsslogdata, false);
             
             rprgs = RANCOPsuedoRangeGroupSet(prg, 4);
             

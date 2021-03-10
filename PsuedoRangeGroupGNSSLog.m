@@ -7,7 +7,7 @@ classdef PsuedoRangeGroupGNSSLog < PsuedoRangeGroup
     end
     
     methods
-        function obj = PsuedoRangeGroupGNSSLog(gnss_log_data)
+        function obj = PsuedoRangeGroupGNSSLog(gnss_log_data, correct_ionosphere)
             
             mrhos = PsuedoRangeGroupGNSSLog.data_pseudoranges(gnss_log_data);
             xsats = gnss_log_data.X;
@@ -15,11 +15,13 @@ classdef PsuedoRangeGroupGNSSLog < PsuedoRangeGroup
             zsats = gnss_log_data.Z;
             bsats = gnss_log_data.B;
             
-            % correct ionosphere
-            svids = gnss_log_data.Svid;
-            bands = PsuedoRangeGroupGNSSLog.determine_bands(gnss_log_data);
-            [mrhos, xsats, ysats, zsats, bsats] = PsuedoRangeGroupGNSSLog. correct_ionosphere(...
-                svids, bands, mrhos, xsats, ysats, zsats, bsats);
+            if correct_ionosphere
+                % correct ionosphere
+                svids = gnss_log_data.Svid;
+                bands = PsuedoRangeGroupGNSSLog.determine_bands(gnss_log_data);
+                [mrhos, xsats, ysats, zsats, bsats] = PsuedoRangeGroupGNSSLog. correct_ionosphere(...
+                    svids, bands, mrhos, xsats, ysats, zsats, bsats);
+            end
             
             obj@PsuedoRangeGroup(mrhos,xsats,ysats,zsats,bsats);
             obj.gnss_log_data = gnss_log_data;

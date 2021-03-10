@@ -10,7 +10,7 @@ classdef TestPseudoRangeGroup < matlab.unittest.TestCase
             b = -2.169197695509361e+03;
             xr_correct = [x;y;z;b];
             
-            prg = PsuedoRangeGroupGNSSLog(gnsslogdata);
+            prg = PsuedoRangeGroupGNSSLog(gnsslogdata, false);
             xr_computed = prg.solve_newton_raphson();
             
             testCase.verifyEqual(xr_computed,xr_correct,'abstol',1e-7);
@@ -64,18 +64,18 @@ classdef TestPseudoRangeGroup < matlab.unittest.TestCase
             
             % appends satellite ECEF positions to the data in data fields
             % X, Y, Z, B
-            gnsslogdata_ALL = append_satellite_positions(eph, gnsslogdata_ALL);
-            gnsslogdata_GPS = append_satellite_positions(eph, gnsslogdata_GPS);
-            gnsslogdata_GLO = append_satellite_positions(eph, gnsslogdata_GLO);
-            gnsslogdata_BEI = append_satellite_positions(eph, gnsslogdata_BEI);
-            gnsslogdata_GAL = append_satellite_positions(eph, gnsslogdata_GAL);
+            gnsslogdata_ALL = SatelliteECEFs.append_satellite_positions(eph, gnsslogdata_ALL);
+            gnsslogdata_GPS = SatelliteECEFs.append_satellite_positions(eph, gnsslogdata_GPS);
+            gnsslogdata_GLO = SatelliteECEFs.append_satellite_positions(eph, gnsslogdata_GLO);
+            gnsslogdata_BEI = SatelliteECEFs.append_satellite_positions(eph, gnsslogdata_BEI);
+            gnsslogdata_GAL = SatelliteECEFs.append_satellite_positions(eph, gnsslogdata_GAL);
            
             % Construct PseudoRangeGroups with seperated psuedorange data
-            prg_ALL = PsuedoRangeGroupGNSSLog(gnsslogdata_ALL);
-            prg_GPS = PsuedoRangeGroupGNSSLog(gnsslogdata_GPS);
-            prg_GLO = PsuedoRangeGroupGNSSLog(gnsslogdata_GLO);
-            prg_BEI = PsuedoRangeGroupGNSSLog(gnsslogdata_BEI);
-            prg_GAL = PsuedoRangeGroupGNSSLog(gnsslogdata_GAL);
+            prg_ALL = PsuedoRangeGroupGNSSLog(gnsslogdata_ALL, false);
+            prg_GPS = PsuedoRangeGroupGNSSLog(gnsslogdata_GPS, false);
+            prg_GLO = PsuedoRangeGroupGNSSLog(gnsslogdata_GLO, false);
+            prg_BEI = PsuedoRangeGroupGNSSLog(gnsslogdata_BEI, false);
+            prg_GAL = PsuedoRangeGroupGNSSLog(gnsslogdata_GAL, false);
             
             % compute positions with each seperated  psuedorange group
             xr_ALL = prg_ALL.solve_newton_raphson();
@@ -98,7 +98,7 @@ classdef TestPseudoRangeGroup < matlab.unittest.TestCase
             b = -1300.23569491921;
             xr_correct = [x;y;z;b];
             
-            prg = PsuedoRangeGroupGNSSLog(gnsslogdata);
+            prg = PsuedoRangeGroupGNSSLog(gnsslogdata, true);
             xr_computed = prg.solve_newton_raphson();
             
             testCase.verifyEqual(xr_computed,xr_correct,'abstol',1e-7);
