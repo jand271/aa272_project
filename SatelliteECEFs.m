@@ -33,9 +33,9 @@ classdef SatelliteECEFs
                                 constellation_ephemeris = ephemeris.gal;
                         end
                         
-                        time_index = find(...
-                            (constellation_ephemeris.Toe < measurement_time) .* ...
-                            (constellation_ephemeris.PRN == gnsslogdata.Svid(i)), 1, 'last');
+                        toes = constellation_ephemeris.Toe;
+                        toes(constellation_ephemeris.PRN ~= gnsslogdata.Svid(i)) = nan;
+                        [~, time_index] = min(abs(toes - measurement_time));
                         
                         if isempty(time_index)
                             % when the hw-based unit test data doesn't
@@ -64,7 +64,7 @@ classdef SatelliteECEFs
                             constellation_ephemeris.Toe(time_index), ...
                             measurement_week, ...
                             measurement_time);
-                        B = constellation_ephemeris.clock_bias(svid) * SatelliteECEFs.c;
+                        B = constellation_ephemeris.clock_bias(time_index) * SatelliteECEFs.c;
                     case 3
                         X = nan;
                         Y = nan;
