@@ -62,13 +62,17 @@ classdef TestPseudoRangeGroup < matlab.unittest.TestCase
             gnsslogdata_BEI = gnsslogdata(gnsslogdata.ConstellationType == 5,:);
             gnsslogdata_GAL = gnsslogdata(gnsslogdata.ConstellationType == 6,:);
             
+            gnsslogdata_GLO_temp = SatelliteECEFs.append_satellite_positions(ephemeris_data, gnsslogdata_GLO([1,2,3,7,8],:));
+            prg_GLO = PsuedoRangeGroupGNSSLog(gnsslogdata_GLO_temp, false);
+            xr_GLO = prg_GLO.solve_newton_raphson();
+            
             % appends satellite ECEF positions to the data in data fields
             % X, Y, Z, B
-            gnsslogdata_ALL = SatelliteECEFs.append_satellite_positions(eph, gnsslogdata_ALL);
-            gnsslogdata_BEI = SatelliteECEFs.append_satellite_positions(eph, gnsslogdata_BEI);
-            gnsslogdata_GPS = SatelliteECEFs.append_satellite_positions(eph, gnsslogdata_GPS);
-            gnsslogdata_GLO = SatelliteECEFs.append_satellite_positions(eph, gnsslogdata_GLO);
-            gnsslogdata_GAL = SatelliteECEFs.append_satellite_positions(eph, gnsslogdata_GAL);
+            gnsslogdata_ALL = SatelliteECEFs.append_satellite_positions(ephemeris_data, gnsslogdata_ALL);
+            gnsslogdata_BEI = SatelliteECEFs.append_satellite_positions(ephemeris_data, gnsslogdata_BEI);
+            gnsslogdata_GPS = SatelliteECEFs.append_satellite_positions(ephemeris_data, gnsslogdata_GPS);
+            gnsslogdata_GLO = SatelliteECEFs.append_satellite_positions(ephemeris_data, gnsslogdata_GLO);
+            gnsslogdata_GAL = SatelliteECEFs.append_satellite_positions(ephemeris_data, gnsslogdata_GAL);
             
             % Construct PseudoRangeGroups with seperated psuedorange data
             prg_ALL = PsuedoRangeGroupGNSSLog(gnsslogdata_ALL, false);
