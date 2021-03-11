@@ -10,8 +10,6 @@ classdef SatelliteECEFs
     methods(Static, Access=public)
         function gnsslogdata = append_satellite_positions(ephemeris, gnsslogdata)
             
-            ephemeris = SatelliteECEFs.fix_ephemeris_headers(ephemeris);
-            
             n = size(gnsslogdata,1);
             Xs = zeros(n,1);
             Ys = zeros(n,1);
@@ -19,68 +17,36 @@ classdef SatelliteECEFs
             Bs = zeros(n,1);
             
             for i = 1:n
-                measurement_week = floor(-gnsslogdata.FullBiasNanos(i)/604800e9);
-                measurement_time = gnsslogdata.ReceivedSvTimeNanos(i)/1e9;
+                svid = gnsslogdata.Svid(i);
+                sv_time = gnsslogdata.ReceivedSvTimeNanos(i)/1e9;
+                
+                time_of_weeks = gnsslogdata.ReceivedSvTimeNanos/1e9;
+                
                 switch gnsslogdata.ConstellationType(i)
-                    case {1, 5, 6}
-                        switch gnsslogdata.ConstellationType(i)
-                            case 1
-                                constellation_ephemeris = ephemeris.gps;
-                            case 5
-                                constellation_ephemeris = ephemeris.bds;
-                            case 6
-                                constellation_ephemeris = ephemeris.gal;
-                        end
-                        
-                        toes = constellation_ephemeris.Toe;
-                        toes(constellation_ephemeris.PRN ~= gnsslogdata.Svid(i)) = nan;
-                        [~, time_index] = min(abs(toes - measurement_time));
-                        
-                        if gnsslogdata.ConstellationType(i)
-                            measurement_week = constellation_ephemeris.GPS_week_num(time_index);
-                        end
-                        
-                        if isempty(time_index)
-                            % when the hw-based unit test data doesn't
-                            % match the RINEX format, fix to pass unit
-                            % tests
-                            time_index = gnsslogdata.Svid(i);
-                        end
-                        
-                        [X,Y,Z] = SatelliteECEFs.eph_to_ecef(...
-                            constellation_ephemeris.sqrtA(time_index), ...
-                            constellation_ephemeris.e(time_index), ...
-                            constellation_ephemeris.i0(time_index), ...
-                            constellation_ephemeris.omega(time_index), ...
-                            constellation_ephemeris.Delta_n(time_index), ...
-                            constellation_ephemeris.M0(time_index), ...
-                            constellation_ephemeris.GPS_week_num(time_index), ...
-                            constellation_ephemeris.Cuc(time_index), ...
-                            constellation_ephemeris.Cus(time_index), ...
-                            constellation_ephemeris.Cic(time_index), ...
-                            constellation_ephemeris.Cis(time_index), ...
-                            constellation_ephemeris.Crc(time_index), ...
-                            constellation_ephemeris.Crs(time_index), ...
-                            constellation_ephemeris.OMEGA(time_index), ...
-                            constellation_ephemeris.OMEGA_DOT(time_index), ...
-                            constellation_ephemeris.I_DOT(time_index), ...
-                            constellation_ephemeris.Toe(time_index), ...
-                            measurement_week, ...
-                            measurement_time);
-                        B = constellation_ephemeris.clock_bias(time_index) * SatelliteECEFs.c;
+                    case 1
+                        constelation_ephemeris = ephemeris.gps;
+                        getSatPos = @getSatPosGPS;
                     case 3
-                        X = nan;
-                        Y = nan;
-                        Z = nan;
-                        B = nan;
-                    otherwise
-                        error('Not Implemented Constellation Time');
+                        error('Not Correctly Implemented');
+                        constelation_ephemeris = ephemeris.glo;
+                        getSatPos = @getSatPosGLO;
+                    case 5
+                        constelation_ephemeris = ephemeris.bds;
+                        getSatPos = @getSatPosBDS;
+                    case 6
+                        constelation_ephemeris = ephemeris.gal;
+                        getSatPos = @getSatPosGAL;
                 end
                 
-                Xs(i) = X;
-                Ys(i) = Y;
-                Zs(i) = Z;
-                Bs(i) = B;
+                sv_ephemerides = constelation_ephemeris.eph{constelation_ephemeris.sat == svid};
+                eph = SatelliteECEFs.find_best_ephemeris(sv_ephemerides, sv_time);
+                pos = getSatPos([nan time_of_weeks(i)], eph);
+                b = eph(12)*SatelliteECEFs.c;
+                
+                Xs(i) = pos(1);
+                Ys(i) = pos(2);
+                Zs(i) = pos(3);
+                Bs(i) = b;
             end
             gnsslogdata.X = Xs;
             gnsslogdata.Y = Ys;
@@ -207,38 +173,11 @@ classdef SatelliteECEFs
                 E = E0 ;
             end
         end
-        function ephemeris = fix_ephemeris_headers(ephemeris)
-            
-            if istable(ephemeris.gps)
-                ephemeris.gps = table2struct(ephemeris.gps,'ToScalar',true);
-            end
-            if ~isfield(ephemeris.gps,'e')
-                ephemeris.gps.e = ephemeris.gps.Eccentricity;
-            end
-            if ~isfield(ephemeris.gps,'i0')
-                ephemeris.gps.i0 = ephemeris.gps.Io;
-            end
-            if ~isfield(ephemeris.gps,'Delta_n')
-                ephemeris.gps.Delta_n = ephemeris.gps.DeltaN;
-            end
-            if ~isfield(ephemeris.gps,'I_DOT')
-                ephemeris.gps.I_DOT = ephemeris.gps.IDOT;
-            end
-            if ~isfield(ephemeris.gps,'GPS_week_num')
-                ephemeris.gps.GPS_week_num = ephemeris.gps.GPSWeek;
-            end
-            if ~isfield(ephemeris.gps,'OMEGA') % could be wrong
-                ephemeris.gps.OMEGA = ephemeris.gps.Omega0;
-            end
-            if ~isfield(ephemeris.gps,'OMEGA_DOT')
-                ephemeris.gps.OMEGA_DOT = ephemeris.gps.OmegaDot;
-            end
-            if ~isfield(ephemeris.gps,'clock_bias')
-                ephemeris.gps.clock_bias = ephemeris.gps.SVclockBias;
-            end
-            if ~isfield(ephemeris.gps,'PRN')
-                ephemeris.gps.PRN = ephemeris.gps.Svid;
-            end
+        function eph = find_best_ephemeris(sv_ephemerides, sv_time)
+            ToEs = sv_ephemerides(23,:);
+            [~, time_index] = min(abs(ToEs - sv_time));
+            %time_index = find(ToEs < sv_time,1,'last');
+            eph = sv_ephemerides(:,time_index);
         end
     end
 end

@@ -49,6 +49,7 @@ classdef PsuedoRangeGroupGNSSLog < PsuedoRangeGroup
                         weekNumberNanos = floor(-gnss_log_data.FullBiasNanos(1)/NANO_PER_WEEK) * NANO_PER_WEEK;
                         t_Rx(i) = t_Rx_GNSS(i) - weekNumberNanos - 14e9;
                     case 3
+                        error('Not Correctly Implemented');
                         DayNumberNanos = floor(-gnss_log_data.FullBiasNanos(1)/NANO_PER_DAY) * NANO_PER_DAY;
                         t_Rx(i) = t_Rx_GNSS(i) - DayNumberNanos + 3 * 3600e9 - (37-18)*1e9; % 18 needs to not be static!!
                     otherwise
