@@ -21,7 +21,6 @@ classdef SatelliteECEFs
             for i = 1:n
                 measurement_week = floor(-gnsslogdata.FullBiasNanos(i)/604800e9);
                 measurement_time = gnsslogdata.ReceivedSvTimeNanos(i)/1e9;
-                svid = gnsslogdata.Svid(i);
                 switch gnsslogdata.ConstellationType(i)
                     case {1, 5, 6}
                         switch gnsslogdata.ConstellationType(i)
@@ -36,6 +35,10 @@ classdef SatelliteECEFs
                         toes = constellation_ephemeris.Toe;
                         toes(constellation_ephemeris.PRN ~= gnsslogdata.Svid(i)) = nan;
                         [~, time_index] = min(abs(toes - measurement_time));
+                        
+                        if gnsslogdata.ConstellationType(i)
+                            measurement_week = constellation_ephemeris.GPS_week_num(time_index);
+                        end
                         
                         if isempty(time_index)
                             % when the hw-based unit test data doesn't

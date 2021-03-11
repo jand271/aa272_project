@@ -30,13 +30,29 @@ classdef PsuedoRangeGroupGNSSLog < PsuedoRangeGroup
     
     methods(Static, Access=protected)
         function rho_m = data_pseudoranges(gnss_log_data)
-            N_w = floor(-gnss_log_data.FullBiasNanos/604800e9);
-            trx_hw = gnss_log_data.TimeNanos + gnss_log_data.TimeOffsetNanos;
-            b_hw = gnss_log_data.FullBiasNanos + gnss_log_data.BiasNanos;
-            trx_gps = trx_hw - b_hw;
-            trx_w = trx_gps - N_w * 604800e9;
-            rho_ns = trx_w - gnss_log_data.ReceivedSvTimeNanos;
-            rho_m = rho_ns * 299792458/1e9;   
+                        
+            NANO_PER_WEEK = 604800e9;
+            
+            t_Tx = gnss_log_data.ReceivedSvTimeNanos;
+            t_Rx_GNSS = gnss_log_data.TimeNanos + gnss_log_data.TimeOffsetNanos - ...
+                (gnss_log_data.FullBiasNanos(1)+gnss_log_data.BiasNanos(1));
+            
+            n_measurements = size(gnss_log_data, 1);
+            t_Rx = zeros(n_measurements, 1);
+            for i = 1:n_measurements
+                switch gnss_log_data.ConstellationType(i)
+                    case {1,6}
+                        weekNumberNanos = floor(-gnss_log_data.FullBiasNanos(1)/NANO_PER_WEEK) * NANO_PER_WEEK;
+                        t_Rx(i) = t_Rx_GNSS(i) - weekNumberNanos;
+                    case 5
+                        weekNumberNanos = floor(-gnss_log_data.FullBiasNanos(1)/NANO_PER_WEEK) * NANO_PER_WEEK;
+                        t_Rx(i) = t_Rx_GNSS(i) - weekNumberNanos - 14e9;
+                    otherwise
+                        error('Constellation Not implemmented');
+                end
+            end
+            
+            rho_m = (t_Rx - t_Tx) / 1e9 * 299792458;
         end   
         function bands = determine_bands(gnss_log_data)
             n_measurements = size(gnss_log_data,1);
