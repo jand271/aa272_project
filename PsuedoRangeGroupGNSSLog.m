@@ -32,6 +32,7 @@ classdef PsuedoRangeGroupGNSSLog < PsuedoRangeGroup
         function rho_m = data_pseudoranges(gnss_log_data)
                         
             NANO_PER_WEEK = 604800e9;
+            NANO_PER_DAY = 86400e9;
             
             t_Tx = gnss_log_data.ReceivedSvTimeNanos;
             t_Rx_GNSS = gnss_log_data.TimeNanos + gnss_log_data.TimeOffsetNanos - ...
@@ -47,6 +48,9 @@ classdef PsuedoRangeGroupGNSSLog < PsuedoRangeGroup
                     case 5
                         weekNumberNanos = floor(-gnss_log_data.FullBiasNanos(1)/NANO_PER_WEEK) * NANO_PER_WEEK;
                         t_Rx(i) = t_Rx_GNSS(i) - weekNumberNanos - 14e9;
+                    case 3
+                        DayNumberNanos = floor(-gnss_log_data.FullBiasNanos(1)/NANO_PER_DAY) * NANO_PER_DAY;
+                        t_Rx(i) = t_Rx_GNSS(i) - DayNumberNanos + 3 * 3600e9 - (37-18)*1e9; % 18 needs to not be static!!
                     otherwise
                         error('Constellation Not implemmented');
                 end
