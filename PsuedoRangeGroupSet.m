@@ -31,10 +31,34 @@ classdef PsuedoRangeGroupSet < handle
             xrs = obj.solve_each_newton_raphson();
             xr_cov = cov(xrs');
         end
-        function [lowers, uppers] = bs_ranges(obj, lower_bound, upper_bound)
+        function plot_percentile_ellipse(obj, lower_bound, upper_bound)
             xrs = obj.solve_each_newton_raphson();
-            lowers = prctile(xrs, lower_bound,2);
-            uppers = prctile(xrs, upper_bound,2);
+            
+            n = size(xrs,2);
+            
+            [U,~,~] = svd(xrs(1:2,:));
+            
+            dxrs = xrs - mean(xrs,2);
+            dxrs = dxrs(1:2,:);
+            
+            p1_projection = sum(dxrs.*U(:,1),1);
+            p1_sorted = sort(p1_projection);
+            p1_lower = p1_sorted(floor(lower_bound*n));
+            p1_upper = p1_sorted(ceil(upper_bound*n));
+            p1_radius = (p1_upper - p1_lower)/2;
+            v1 = p1_radius * U(:,1);
+            
+            p2_projection = sum(dxrs.*U(:,2),1);
+            p2_sorted = sort(p2_projection);
+            p2_lower = p2_sorted(floor(lower_bound*n));
+            p2_upper = p2_sorted(ceil(upper_bound*n));
+            p2_radius = (p2_upper - p2_lower)/2;
+            v2 = p2_radius * U(:,2);
+            
+            t = linspace(0,2*pi);
+            p = v1 * cos(t) + v2*sin(t);
+            
+            plot(p(1,:),p(2,:));
         end
         function Gs = geometry_matrices(obj)
             number_per_group = size(obj.psuedoRangeGroupSet(1).geometry_matrix([0;0;0;0]),1);

@@ -8,7 +8,7 @@ classdef PsuedoRangeGroup < handle
         zsats
         bsats
         
-        tolerance = 1e-6;
+        tolerance = 1e-2;
         max_iter = 50;
     end
     
@@ -100,7 +100,7 @@ classdef PsuedoRangeGroup < handle
             G(:,1:3) = G(:,1:3) ./ rho0s;
         end    
         
-        function [S,PDOP,TDOP,GDOP] = DOPcalcs(obj, x0)
+        function [S,PDOP,TDOP,GDOP] = DOPcalcs(obj, x0, sigma_URE)
             % calculates dilution of precision values and sigma matrix given geometry matrix
             % S = sigma matrix
             % PDOP = position dilution of precision
@@ -125,7 +125,7 @@ classdef PsuedoRangeGroup < handle
             GDOP = sqrt((PDOP^2)+(TDOP^2));
             
             % user range error sigma
-            sigma_URE = 6.7/3;
+            %sigma_URE = 6.7/3;
             
             % sigma matrix with sigmas along diagonal
             S = (sigma_URE^2).*DOPmatrix;
