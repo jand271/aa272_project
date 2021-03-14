@@ -38,11 +38,16 @@ classdef SatelliteECEFs
                         getSatPos = @getSatPosGAL;
                 end
                 
-                sv_ephemerides = constelation_ephemeris.eph{constelation_ephemeris.sat == svid};
-                eph = SatelliteECEFs.find_best_ephemeris(sv_ephemerides, sv_time);
-                pos = getSatPos([nan time_of_weeks(i)], eph);
-                b = eph(12)*SatelliteECEFs.c;
-                
+                try
+                    sv_ephemerides = constelation_ephemeris.eph{constelation_ephemeris.sat == svid};
+                    eph = SatelliteECEFs.find_best_ephemeris(sv_ephemerides, sv_time);
+                    pos = getSatPos([nan time_of_weeks(i)], eph);
+                    b = eph(12)*SatelliteECEFs.c;
+                catch
+                    pos = nan(3,1);
+                    b = nan;
+                end
+
                 Xs(i) = pos(1);
                 Ys(i) = pos(2);
                 Zs(i) = pos(3);

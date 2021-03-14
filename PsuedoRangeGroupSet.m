@@ -31,6 +31,11 @@ classdef PsuedoRangeGroupSet < handle
             xrs = obj.solve_each_newton_raphson();
             xr_cov = cov(xrs');
         end
+        function [lowers, uppers] = bs_ranges(obj, lower_bound, upper_bound)
+            xrs = obj.solve_each_newton_raphson();
+            lowers = prctile(xrs, lower_bound,2);
+            uppers = prctile(xrs, upper_bound,2);
+        end
         function Gs = geometry_matrices(obj)
             number_per_group = size(obj.psuedoRangeGroupSet(1).geometry_matrix([0;0;0;0]),1);
             n = length(obj.psuedoRangeGroupSet);

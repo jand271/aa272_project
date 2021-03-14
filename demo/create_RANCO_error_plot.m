@@ -9,7 +9,7 @@ close all;
 load(fullfile(fileparts(mfilename('fullpath')),'../test','hw2_first_gnss_solution_data.mat'));
 
 % create PsuedoRangeGroup object
-prg = PsuedoRangeGroupGNSSLog(gnsslogdata);
+prg = PsuedoRangeGroupGNSSLog(gnsslogdata, false);
 
 %% Compute RANCO Errors
 
