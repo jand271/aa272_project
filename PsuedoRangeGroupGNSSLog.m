@@ -2,7 +2,7 @@ classdef PsuedoRangeGroupGNSSLog < PsuedoRangeGroup
     %PSUEDORANGEGROUPGNSSLOG Methods pertaining to PsuedoRangeGroups from
     %GNSS Log data
     
-    properties(Access = protected)
+    properties(Access = public)
         gnss_log_data
     end
     
