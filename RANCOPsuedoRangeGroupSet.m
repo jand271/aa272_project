@@ -55,7 +55,7 @@ classdef RANCOPsuedoRangeGroupSet < PsuedoRangeGroupSet
             n_subsets = length(obj.psuedoRangeGroupSet);
             n_sats = obj.psuedoRangeGroupSetParent.n_measurements;
             % assumed GPS estimated covariance
-            W =  (diag([6, 6, 6, 2])/299792458).^2;
+            W =  (diag(6*ones(obj.psuedoRangeGroupSet(1).n_measurements,1))).^2;
             sig = 0;
 
             [xrs, ~, Gs] = obj.solve_each_newton_raphson();

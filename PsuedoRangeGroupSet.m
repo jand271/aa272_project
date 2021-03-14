@@ -16,7 +16,7 @@ classdef PsuedoRangeGroupSet < handle
             ns = zeros(obj.psuedoRangeGroupSet(1).n_measurements,N);
             [~,~,G0] = obj.psuedoRangeGroupSet(1).solve_newton_raphson();
             Gs = zeros(N, size(G0,1), size(G0,2));
-            for i = 1:N
+            parfor i = 1:N
                 [xr, n, G] = obj.psuedoRangeGroupSet(i).solve_newton_raphson();
                 xrs(:,i) = xr;
                 ns(:,i) = n;

@@ -8,7 +8,7 @@ classdef PsuedoRangeGroup < handle
         zsats
         bsats
         
-        tolerance = 1e-2;
+        tolerance = 1e-1;
         max_iter = 50;
     end
     
@@ -63,7 +63,9 @@ classdef PsuedoRangeGroup < handle
                 xr = xr + del_xb;
 
                 if i == obj.max_iter
-                    error("Reached Max Iteration");
+                   % error("Reached Max Iteration");
+                   xr = [nan;nan;nan;nan];
+                   break
                 end
                 
                 i = i+1;
