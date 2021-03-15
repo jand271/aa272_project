@@ -8,7 +8,7 @@ classdef PsuedoRangeGroup < handle
         zsats
         bsats
         
-        tolerance = 1e-2;
+        tolerance = 1e-6;
         max_iter = 50;
     end
     

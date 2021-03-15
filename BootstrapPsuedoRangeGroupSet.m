@@ -14,7 +14,7 @@ classdef BootstrapPsuedoRangeGroupSet < PsuedoRangeGroupSet
             for i = 1:number_of_samples
                 while true
                     row = randi([1,psuedoRangeGroup.n_measurements], 1, number_per_group);
-                    if length(unique(row)) > 6
+                    if length(unique(row)) > 4
                         break;
                     end
                 end

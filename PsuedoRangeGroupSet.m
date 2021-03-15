@@ -17,7 +17,13 @@ classdef PsuedoRangeGroupSet < handle
             [~,~,G0] = obj.psuedoRangeGroupSet(1).solve_newton_raphson();
             Gs = zeros(N, size(G0,1), size(G0,2));
             for i = 1:N
-                [xr, n, G] = obj.psuedoRangeGroupSet(i).solve_newton_raphson();
+                try
+                    [xr, n, G] = obj.psuedoRangeGroupSet(i).solve_newton_raphson();
+                catch
+                    xr = nan(4,1);
+                    n = nan(obj.psuedoRangeGroupSet(1).n_measurements,1);
+                    G = nan(size(G0,1), size(G0,2));
+                end
                 xrs(:,i) = xr;
                 ns(:,i) = n;
                 Gs(i,:,:) = G;
@@ -33,6 +39,8 @@ classdef PsuedoRangeGroupSet < handle
         end
         function plot_percentile_ellipse(obj, lower_bound, upper_bound)
             xrs = obj.solve_each_newton_raphson();
+            
+            xrs = xrs(:,~isnan(xrs(1,:)));
             
             n = size(xrs,2);
             
@@ -56,9 +64,9 @@ classdef PsuedoRangeGroupSet < handle
             v2 = p2_radius * U(:,2);
             
             t = linspace(0,2*pi);
-            p = v1 * cos(t) + v2*sin(t);
+            p = v1 * cos(t) + v2*sin(t) + mean(xrs(1:2,:),2);
             
-            plot(p(1,:),p(2,:));
+            plot(p(1,:),p(2,:),'LineWidth',4);
         end
         function Gs = geometry_matrices(obj)
             number_per_group = size(obj.psuedoRangeGroupSet(1).geometry_matrix([0;0;0;0]),1);
