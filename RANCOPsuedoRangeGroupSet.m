@@ -4,6 +4,7 @@ classdef RANCOPsuedoRangeGroupSet < PsuedoRangeGroupSet
     
     properties
         psuedoRangeGroupSetParent;
+        combo_ind;
     end
     
     methods(Access = public)
@@ -12,7 +13,7 @@ classdef RANCOPsuedoRangeGroupSet < PsuedoRangeGroupSet
             % compute the set of indices that make all combinations of the
             % psuedo ranges taken number_per_group at a time
             indices = nchoosek(1:psuedoRangeGroup.n_measurements, number_per_group);
-            
+                        
             [mrhos,xsats,ysats,zsats,bsats] = psuedoRangeGroup.get_data();
             
             psuedoRangeGroups = PsuedoRangeGroup.empty(size(indices,1),0);
@@ -28,6 +29,11 @@ classdef RANCOPsuedoRangeGroupSet < PsuedoRangeGroupSet
             
             obj@PsuedoRangeGroupSet(psuedoRangeGroups);
             obj.psuedoRangeGroupSetParent = psuedoRangeGroup;
+            obj.combo_ind = indices;
+
+        end
+        function svid_combo = get_svid_combo(psuedoRangeGroup, number_per_group)
+                    svid_combo = nchoosek(1:psuedoRangeGroup.n_measurements, number_per_group);
         end
         function sat_errors = satellite_errors(obj)
             % computes the individual satellite RANCO errors
