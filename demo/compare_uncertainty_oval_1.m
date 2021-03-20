@@ -45,7 +45,7 @@ static_cov = cov(xrs');
 number_of_samples = 1000;
 number_per_group = 7;
  
-t = floor(n_times/2);
+t = floor(n_times/2-500);
 gnsslogdata_instance = gnsslogdata_nonan(gnsslogdata_nonan.TimeNanos == times(t),:);
 prg = PsuedoRangeGroupGNSSLog(gnsslogdata_instance, false);
 
@@ -69,8 +69,9 @@ end
 e = error_ellipse(S(1:2,1:2), xr_instance(1:2),'conf',0.90);
 e.LineWidth = 8;
 
-e = error_ellipse(static_cov(1:2,1:2),static_mean(1:2),0.90);
-e.LineWidth = 4;
+PlottingUtils.plot_percentile_ellipse(xrs,0.05,0.95,'b');
+% e = error_ellipse(static_cov(1:2,1:2),static_mean(1:2),0.90);
+% e.LineWidth = 4;
 
 xlim(-2699975 + [-150,150]);
 ylim(-4292640 + [-150,150]);

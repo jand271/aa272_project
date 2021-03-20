@@ -61,6 +61,10 @@ for n = 7:14
     brpg.plot_percentile_ellipse(0.05,0.95);   
     
     if n == 7   
+%         hist(xrs_bs(1,:),300);
+%         xlabel('X ECEF');
+%         ylabel('Frequency');
+%         title('Bootstrapped X Samples');
         plot(xrs_bs(1,:),xrs_bs(2,:),'ro');
     end
 end
@@ -71,8 +75,9 @@ end
 e = error_ellipse(S(1:2,1:2), xr_instance(1:2),'conf',0.90);
 e.LineWidth = 8;
 
-e = error_ellipse(static_cov(1:2,1:2),static_mean(1:2),0.90);
-e.LineWidth = 4;
+PlottingUtils.plot_percentile_ellipse(xrs,0.05,0.95,'b');
+% e = error_ellipse(static_cov(1:2,1:2),static_mean(1:2),0.90);
+% e.LineWidth = 4;
 
 xlim(-2699650 + [-150, 150]);
 ylim(-4293100 + [-150, 150]);
